@@ -1,0 +1,20 @@
+export profile="aws-profile"
+export AWS_DEFAULT_PROFILE="$profile"
+export AWS_PROFILE="$profile"
+export AWS_EB_PROFILE="$profile"
+
+[[ -z $1 ]] && export PROFILE=$profile || export PROFILE=$1
+export AWS_PAGER=""
+export USERNAME=
+aws ec2 describe-instances --profile $profile  --output json --query "Reservations[*].Instances[*].{privateIP:PrivateIpAddress, tags:Tags[?Key=='Name']}"  | jq -r '.[][] |"\(.privateIP) \(.tags[].Value)"' > ./tmp-file
+while read line
+do
+read IP NAME <<< $line
+echo "
+Host $NAME
+        HostName $IP
+        User $USERNAME
+        Port 22
+"
+done < <(cat tmp-file)
+

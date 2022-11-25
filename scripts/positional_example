@@ -1,0 +1,40 @@
+1:POSITIONAL_ARGS=()
+24:      POSITIONAL_ARGS+=("$1") # save positional arg
+29:set -- "${POSITIONAL_ARGS[@]}"
+--- ~/Scripts » vim Loki.sh
+--- ~/Scripts » cat Loki.sh
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--host)
+      HOST="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -s|--service)
+      SERVICE="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -f|--filter)
+      FILTER="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
+set -- "${POSITIONAL_ARGS[@]}"
+
+[[ "$HOST" =~ "all" ]] && HOST="server-1|server-2" || HOST=$HOST-stg
+
+URL="https://grafana.domain.com/explore?orgId=1&left=%7B%22datasource%22:%22loki_data_source%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22expr%22:%22%7Bnode_name%3D~%5C%22${HOST}%5C%22,service_name%3D%5C%22${SERVICE}%5C%22%7D%20%21~%5C%22%2F${FILTER}%5C%22%20%7C%20json%20%7C%20line_format%5C%22%7B%7B.message%7D%7D%5C%22%22,%22queryType%22:%22range%22,%22editorMode%22:%22code%22%7D%5D,%22range%22:%7B%22from%22:%22now-6h%22,%22to%22:%22now%22%7D%7D"
+
+exec firefox $URL > /dev/null
