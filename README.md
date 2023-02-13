@@ -54,4 +54,8 @@ for i in $(cat list);do  [[ $(ssh ${i} 'systemctl status service | grep Active')
 
 while :; do nc -zv -w 2 10.10.10.10 22 ; sleep 0.5 ;done
 
+diff <(ssh nginx-1 'cat /etc/nginx/nginx.conf') <(ssh nginx-2 'cat /etc/nginx/nginx.conf')
+
+seq 1 20 | xargs -P10 -I{} curl -s -o /dev/null -w "%{remote_ip} - %{http_code}\n" https://google.com
+
 ```
