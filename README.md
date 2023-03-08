@@ -1,4 +1,4 @@
-# workflow_things
+# workflow_things 😎
 Mostly made to send a link when people ask
 neat things I've found to improve my workflow
 # tools 
